@@ -28,6 +28,7 @@ function getMaverickHTML(userData: any) {
                 <h1 class="m-hero-title" id="hero-name">MAVERICK</h1>
                 <div class="m-hero-sub" id="hero-role">CREATIVE DIRECTOR</div>
                 <p class="m-hero-bio" id="hero-bio"></p>
+                <div class="m-hero-contact" id="hero-contact"></div>
                 <div class="m-hero-ctas">
                     <a href="#" id="hero-email-btn" class="main-cta">GET IN TOUCH</a>
                     <a href="#sec-experience" class="sec-cta">VIEW JOURNEY ↓</a>
@@ -83,6 +84,10 @@ body {
 .m-hero-title { font-family: 'Archivo Black', sans-serif; font-size: clamp(3.5rem, 13vw, 10rem); line-height: 0.8; letter-spacing: -0.05em; text-transform: uppercase; }
 .m-hero-sub { font-size: clamp(1.2rem, 3.5vw, 2.8rem); font-weight: 900; color: #fff; margin-top: 25px; font-style: italic; }
 .m-hero-bio { color: var(--gray); font-size: 1.15rem; max-width: 750px; margin-top: 35px; line-height: 1.6; }
+.m-hero-contact { display: flex; flex-wrap: wrap; gap: 30px; margin-top: 30px; font-size: 0.8rem; font-weight: 800; letter-spacing: 0.15em; text-transform: uppercase; }
+.m-hero-contact a { color: var(--ink); text-decoration: none; border-bottom: 2px solid var(--accent); padding-bottom: 2px; transition: all 0.2s; }
+.m-hero-contact a:hover { color: var(--accent); }
+.m-hero-contact span { color: var(--accent); }
 
 .m-hero-ctas { display: flex; flex-wrap: wrap; gap: 20px; margin-top: 50px; }
 .main-cta { background: var(--accent); color: #fff; text-decoration: none; padding: 18px 45px; font-size: 0.8rem; font-weight: 900; letter-spacing: 0.15em; border-radius: 4px; transition: transform 0.2s; }
@@ -186,6 +191,16 @@ function render() {
     if (info.email) {
         document.getElementById('hero-email-btn').href = "mailto:" + info.email;
         document.getElementById('header-email-link').href = "mailto:" + info.email;
+    }
+
+    const contactRow = document.getElementById('hero-contact');
+    if (contactRow) {
+        contactRow.innerHTML = '';
+        const ensureUrl = (u) => u?.startsWith('http') ? u : 'https://' + u;
+        if (info.phone) contactRow.innerHTML += \`<a href="tel:\${info.phone}">\${info.phone}</a>\`;
+        if (info.location) contactRow.innerHTML += \`<span>\${info.location}</span>\`;
+        if (info.github) contactRow.innerHTML += \`<a href="\${ensureUrl(info.github)}" target="_blank">GITHUB ↗</a>\`;
+        if (info.linkedin) contactRow.innerHTML += \`<a href="\${ensureUrl(info.linkedin)}" target="_blank">LINKEDIN ↗</a>\`;
     }
 
     const sections = [];

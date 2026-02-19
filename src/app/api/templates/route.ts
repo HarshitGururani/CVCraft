@@ -20,7 +20,7 @@ export async function GET() {
         category: 1,
       },
     )
-      .sort({ createdAt: -1 })
+      .sort({ createdAt: 1 })
       .lean();
     return NextResponse.json({ templates });
   } catch (error) {

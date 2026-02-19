@@ -19,6 +19,7 @@ function getMagazineHTML(userData: any) {
             <div class="hero-inner">
                 <h1 class="hero-name" id="hero-name"></h1>
                 <p class="hero-role" id="hero-role"></p>
+                <div class="hero-contact" id="hero-contact"></div>
                 <div class="hero-rule"></div>
             </div>
         </section>
@@ -85,6 +86,9 @@ body {
 .hero-section { padding: 60px 40px; border-bottom: 5px double var(--ink); text-align: center; }
 .hero-name { font-family: 'DM Serif Display', serif; font-size: clamp(3rem, 12vw, 8.5rem); line-height: 0.85; margin-bottom: 20px; text-transform: uppercase; }
 .hero-role { font-family: 'Bebas Neue', sans-serif; font-size: 1.3rem; letter-spacing: 0.4em; color: var(--accent); }
+.hero-contact { display: flex; justify-content: center; gap: 20px; margin-top: 25px; font-size: 0.9rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; flex-wrap: wrap; }
+.hero-contact a { color: var(--ink); text-decoration: none; border-bottom: 2.5px solid var(--accent); }
+.hero-contact span { color: var(--accent); }
 .hero-rule { width: 80px; height: 4px; background: var(--ink); margin: 30px auto 0; }
 
 .mag-section { padding: 60px 40px; border-bottom: 1px solid rgba(0,0,0,0.1); }
@@ -141,8 +145,17 @@ function render() {
     const roleEl = document.getElementById('hero-role');
     if (nameEl) nameEl.textContent = (info.name || "YOUR NAME").toUpperCase();
     if (roleEl) {
-        roleEl.textContent = (info.title || "").toUpperCase();
         roleEl.style.display = info.title ? 'block' : 'none';
+    }
+
+    const contactEl = document.getElementById('hero-contact');
+    if (contactEl) {
+        contactEl.innerHTML = '';
+        if (info.email) contactEl.innerHTML += \`<a href="mailto:\${info.email}">Email</a>\`;
+        if (info.phone) contactEl.innerHTML += \`<a href="tel:\${info.phone}">Phone</a>\`;
+        if (info.location) contactEl.innerHTML += \`<span>\${info.location}</span>\`;
+        if (info.github) contactEl.innerHTML += \`<a href="\${ensureUrl(info.github)}" target="_blank">Github</a>\`;
+        if (info.linkedin) contactEl.innerHTML += \`<a href="\${ensureUrl(info.linkedin)}" target="_blank">LinkedIn</a>\`;
     }
 
     const fName = document.getElementById('footer-name');
@@ -228,7 +241,7 @@ function renderSkills(con) {
 }
 
 function renderAbout(con) {
-    const summary = resumeData.summary || resumeData.personalInfo.summary || "Designing the future through code and creativity.";
+    const summary = resumeData.summary || resumeData.personalInfo.summary || "Breaking boundaries through creative innovation and strategic design...";
     con.innerHTML = \`<p style="font-family:'DM Serif Display'; font-style:italic; font-size:1.8rem; color:#6b6050; line-height:1.6; margin-bottom:60px; max-width:800px;">\${summary}</p>\`;
     if (resumeData.education?.length) {
         let h = '<h2 style="font-family:Bebas Neue; font-size:2.2rem; border-bottom:3px solid #1a1208; margin-bottom:30px; display:inline-block; letter-spacing:2px;">EDUCATION</h2>';

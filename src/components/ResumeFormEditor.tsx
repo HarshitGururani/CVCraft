@@ -11,6 +11,7 @@ import {
   Plus,
   Trash2,
   CheckCircle,
+  Sparkles,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -27,7 +28,7 @@ interface ResumeFormEditorProps {
 
 const TABS = [
   { id: "personal", icon: User, label: "Personal Info" },
-  { id: "summary", icon: Brain, label: "About" },
+  { id: "summary", icon: Sparkles, label: "About" },
   { id: "experience", icon: Briefcase, label: "Experience" },
   { id: "projects", icon: Layout, label: "Projects" },
   { id: "skills", icon: Brain, label: "Skills" },
@@ -95,7 +96,9 @@ export default function ResumeFormEditor({
               placeholder={
                 templateName?.toLowerCase() === "terminal"
                   ? "> Write your mission statement here..."
-                  : "Breaking boundaries through creative innovation and strategic design..."
+                  : templateName?.toLowerCase() === "maverick"
+                    ? "Pushing the boundaries of digital design and development with a focus on high-impact creativity."
+                    : "Breaking boundaries through creative innovation and strategic design..."
               }
             />
           </div>

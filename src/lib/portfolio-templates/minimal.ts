@@ -64,6 +64,7 @@ function getMinimalHTML(userData: any) {
                 <div class="footer-top-row">
                     <div class="footer-brand-simple" id="footer-brand-name">NAME</div>
                     <div class="footer-tagline-simple">Designing the future.</div>
+                    <div class="footer-contact-list" id="footer-contact"></div>
                 </div>
                 
                 <div class="footer-bottom-row">
@@ -164,6 +165,10 @@ body { background: var(--bg); color: var(--ink); font-family: 'Inter', sans-seri
 @media (min-width: 768px) { .footer-top-row { flex-direction: row; justify-content: space-between; align-items: flex-end; } }
 .footer-brand-simple { font-family: 'Playfair Display', serif; font-size: 1.6rem; font-weight: 700; pointer-events: none; }
 .footer-tagline-simple { font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+.footer-contact-list { display: flex; flex-wrap: wrap; gap: 20px; font-size: 0.65rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; margin-top: 15px; }
+.footer-contact-list a { color: var(--ink); text-decoration: none; border-bottom: 1px solid var(--rule); transition: all 0.3s; }
+.footer-contact-list a:hover { border-color: var(--ink); color: var(--ink); }
+.footer-contact-list span { color: var(--muted); }
 .footer-bottom-row { display: flex; justify-content: space-between; align-items: center; padding-top: 35px; border-top: 1px solid var(--rule); color: var(--muted); font-size: 0.6rem; }
 .back-to-top { background: none; border: none; cursor: pointer; color: var(--ink); font-weight: 700; opacity: 0.5; transition: opacity 0.3s; }
 .back-to-top:hover { opacity: 1; }`;
@@ -235,6 +240,17 @@ function render() {
     document.getElementById('hero-year').textContent = new Date().getFullYear();
     
     if (info.email) document.getElementById('header-cta').href = "mailto:" + info.email;
+
+    function ensureUrl(u) { return u?.startsWith('http') ? u : 'https://' + u; }
+
+    const footerContact = document.getElementById('footer-contact');
+    if (footerContact) {
+        footerContact.innerHTML = '';
+        if (info.phone) footerContact.innerHTML += \`<a href="tel:\${info.phone}">\${info.phone}</a>\`;
+        if (info.location) footerContact.innerHTML += \`<span>\${info.location}</span>\`;
+        if (info.github) footerContact.innerHTML += \`<a href="\${ensureUrl(info.github)}" target="_blank">GITHUB</a>\`;
+        if (info.linkedin) footerContact.innerHTML += \`<a href="\${ensureUrl(info.linkedin)}" target="_blank">LINKEDIN</a>\`;
+    }
 
     // Build Navigation Links Array
     const sections = [];
@@ -332,7 +348,7 @@ function renderSkills(con) {
 }
 
 function renderAbout(con) {
-    const sum = resumeData.summary || resumeData.personalInfo?.summary || "Designing the future.";
+    const sum = resumeData.summary || resumeData.personalInfo?.summary || "Breaking boundaries through creative innovation and strategic design...";
     con.innerHTML = \`<p style="font-family:'Playfair Display'; font-size:clamp(1.6rem, 5vw, 3.2rem); line-height:1.2; font-style:italic; border-left: 2px solid var(--ink); padding-left: 30px;">"\${sum}"</p>\`;
 }
 

@@ -41,6 +41,7 @@ function getEliteHTML(userData: any) {
                     <a href="#experience" class="cta-solid">View Journey</a>
                     <a href="#" id="contact-link" class="cta-outline">Get in Touch</a>
                 </div>
+                <div class="hero-contact-row" id="hero-contact"></div>
             </div>
         </section>
 
@@ -55,6 +56,7 @@ function getEliteHTML(userData: any) {
                     <p class="footer-copyright">
                         © <span id="footer-year">2024</span> <span id="footer-name" class="serif">NAME</span>
                     </p>
+                    <div class="footer-contact-row" id="footer-contact"></div>
                     <p class="footer-status">PERSONAL & CONFIDENTIAL // ARCHIVE_2026</p>
                 </div>
             </div>
@@ -132,6 +134,14 @@ body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-ser
 .e-org { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.15em; color: var(--accent); font-weight: 600; margin-bottom: 20px; }
 .e-desc { color: #555; font-size: 1.05rem; line-height: 1.8; }
 
+.hero-contact-row, .footer-contact-row {
+    display: flex; gap: 25px; margin-top: 30px; justify-content: center; flex-wrap: wrap;
+    font-size: 0.75rem; letter-spacing: 0.15em; font-weight: 600; text-transform: uppercase;
+}
+.hero-contact-row a, .footer-contact-row a { color: var(--text); text-decoration: none; border-bottom: 1px solid var(--accent); transition: 0.3s; }
+.hero-contact-row a:hover, .footer-contact-row a:hover { color: var(--accent); }
+.hero-contact-row span, .footer-contact-row span { color: var(--accent); }
+
 /* 5. FOOTER */
 .elite-footer { padding: 100px 25px 60px; text-align: center; }
 .footer-divider { width: 80px; height: 1px; background: var(--accent); margin: 0 auto 40px; }
@@ -181,7 +191,7 @@ function render() {
     document.querySelectorAll('#header-name, #hero-name, #footer-name').forEach(el => {
         el.textContent = info.name || "ELITE";
     });
-    document.getElementById('hero-tagline').textContent = resumeData.summary || info.summary || "CURATING PROFESSIONAL IMPACT.";
+    document.getElementById('hero-tagline').textContent = resumeData.summary || info.summary || "Breaking boundaries through creative innovation and strategic design...";
     
     const year = new Date().getFullYear();
     document.getElementById('footer-year').textContent = year;
@@ -189,6 +199,20 @@ function render() {
     if (statusEl) statusEl.textContent = "PERSONAL & CONFIDENTIAL // ARCHIVE_" + year;
     
     if (info.email) document.getElementById('contact-link').href = "mailto:" + info.email;
+
+    function ensureUrl(u) { return u?.startsWith('http') ? u : 'https://' + u; }
+
+    const renderContact = (elId) => {
+        const el = document.getElementById(elId);
+        if (!el) return;
+        el.innerHTML = '';
+        if (info.phone) el.innerHTML += \`<a href="tel:\${info.phone}">\${info.phone}</a>\`;
+        if (info.location) el.innerHTML += \`<span>\${info.location}</span>\`;
+        if (info.github) el.innerHTML += \`<a href="\${ensureUrl(info.github)}" target="_blank">GITHUB</a>\`;
+        if (info.linkedin) el.innerHTML += \`<a href="\${ensureUrl(info.linkedin)}" target="_blank">LINKEDIN</a>\`;
+    };
+    renderContact('hero-contact');
+    renderContact('footer-contact');
 
     const list = [];
     if (resumeData.experience?.length) list.push('experience');

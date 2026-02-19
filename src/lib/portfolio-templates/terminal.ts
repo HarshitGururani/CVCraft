@@ -152,7 +152,6 @@ body { background: #000; font-family: 'JetBrains Mono', monospace; color: var(--
 .entry-title { color: var(--green-bright); font-weight: bold; font-size: 1.1rem; }
 .desc-list { list-style: none; font-size: 0.85rem; color: var(--muted); line-height: 1.8; margin-top: 10px; }
 .desc-list li { margin-bottom: 6px; }
-
 .tech-badge { 
     font-size: 0.65rem; background: rgba(88,166,255,0.08); color: var(--blue); 
     padding: 4px 10px; margin: 0 8px 8px 0; border: 1px solid rgba(88,166,255,0.15); border-radius: 4px; display: inline-block; 
@@ -244,6 +243,9 @@ function render() {
         <div style="font-size: 0.8rem; line-height: 2.2;">
             \${info.location ? \`<div><span class="lbl">LOC</span> <span style="color:var(--text)">\${info.location}</span></div>\` : ''}
             \${info.email ? \`<div><span class="lbl">MAIL</span> <span style="color:var(--text)">\${info.email}</span></div>\` : ''}
+            \${info.phone ? \`<div><span class="lbl">PHONE</span> <span style="color:var(--text)">\${info.phone}</span></div>\` : ''}
+            \${info.github ? \`<div><span class="lbl">GIT</span> <span style="color:var(--text)">\${info.github}</span></div>\` : ''}
+            \${info.linkedin ? \`<div><span class="lbl">LINK</span> <span style="color:var(--text)">\${info.linkedin}</span></div>\` : ''}
         </div>
     \`;
     content.appendChild(boot);
@@ -308,7 +310,7 @@ function renderSkills(el) {
 }
 
 function renderAbout(el) {
-    const sum = resumeData.summary || resumeData.personalInfo?.summary || "Designing the future...";
+    const sum = resumeData.summary || resumeData.personalInfo?.summary || "> Write your mission statement here...";
     el.innerHTML += \`<div class="entry-block" style="margin-bottom:60px;"><div style="font-size:0.7rem; color:var(--purple); margin-bottom:15px;">/* MISSION_STATEMENT */</div><p style="font-size:1.1rem; line-height:1.8; color:var(--text); font-style: italic;">"\${sum}"</p></div>\`;
     if (resumeData.education?.length) {
         el.innerHTML += \`<div style="color:var(--purple); font-size:0.8rem; margin: 50px 0 25px; font-weight:bold;">// ACADEMIC_HISTORY</div>\`;

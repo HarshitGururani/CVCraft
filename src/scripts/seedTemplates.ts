@@ -34,18 +34,6 @@ const allTemplates = [
     js: maverickTemplate.getJS(),
   },
   {
-    templateId: "brutalist",
-    name: "Brutalist",
-    description:
-      "Raw, high-contrast design with bold typography and a developer aesthetic.",
-    tags: ["Raw", "High Contrast", "Bold"],
-    category: "Brutalist",
-    preview: "/templates/brutalist-preview.png",
-    html: prepareHTML(brutalistTemplate),
-    css: brutalistTemplate.getCSS(),
-    js: brutalistTemplate.getJS(),
-  },
-  {
     templateId: "elite-narrative",
     name: "Elite Narrative",
     description:
@@ -56,18 +44,6 @@ const allTemplates = [
     html: prepareHTML(eliteNarrativeTemplate),
     css: eliteNarrativeTemplate.getCSS(),
     js: eliteNarrativeTemplate.getJS(),
-  },
-  {
-    templateId: "terminal",
-    name: "Terminal",
-    description:
-      "A command-line interface inspired portfolio for the true power user.",
-    tags: ["Developer", "Tech", "Interactive"],
-    category: "Creative",
-    preview: "/templates/terminal-preview.png",
-    html: prepareHTML(terminalTemplate),
-    css: terminalTemplate.getCSS(),
-    js: terminalTemplate.getJS(),
   },
   {
     templateId: "minimal",
@@ -82,6 +58,18 @@ const allTemplates = [
     js: minimalSuperiorTemplate.getJS(),
   },
   {
+    templateId: "terminal",
+    name: "Terminal",
+    description:
+      "A command-line interface inspired portfolio for the true power user.",
+    tags: ["Developer", "Tech", "Interactive"],
+    category: "Creative",
+    preview: "/templates/terminal-preview.png",
+    html: prepareHTML(terminalTemplate),
+    css: terminalTemplate.getCSS(),
+    js: terminalTemplate.getJS(),
+  },
+  {
     templateId: "magazine",
     name: "Magazine",
     description:
@@ -92,6 +80,18 @@ const allTemplates = [
     html: prepareHTML(magazineTemplate),
     css: magazineTemplate.getCSS(),
     js: magazineTemplate.getJS(),
+  },
+  {
+    templateId: "brutalist",
+    name: "Brutalist",
+    description:
+      "Raw, high-contrast design with bold typography and a developer aesthetic.",
+    tags: ["Raw", "High Contrast", "Bold"],
+    category: "Brutalist",
+    preview: "/templates/brutalist-preview.png",
+    html: prepareHTML(brutalistTemplate),
+    css: brutalistTemplate.getCSS(),
+    js: brutalistTemplate.getJS(),
   },
 ];
 
@@ -104,6 +104,10 @@ async function seed() {
     dbName: process.env.MONGODB_DB || "cvcraft_dev",
   });
   console.log("Connected to MongoDB for seeding...");
+
+  // Clear existing templates to ensure the order is correct based on createdAt
+  await Template.deleteMany({});
+  console.log("Cleared existing templates.");
 
   for (const template of allTemplates) {
     await Template.findOneAndUpdate(

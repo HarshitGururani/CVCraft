@@ -317,6 +317,8 @@ function render() {
     contactRow.innerHTML = '';
     
     if (info.email) contactRow.innerHTML += \`<a href="mailto:\${info.email}" class="contact-btn contact-mobile">Email</a>\`;
+    if (info.phone) contactRow.innerHTML += \`<a href="tel:\${info.phone}" class="contact-btn contact-mobile">Phone</a>\`;
+    if (info.location) contactRow.innerHTML += \`<span class="contact-btn contact-mobile" style="cursor: default;">\${info.location}</span>\`;
     if (info.github) contactRow.innerHTML += \`<a href="\${ensureUrl(info.github)}" target="_blank" class="contact-btn contact-mobile">Github</a>\`;
     if (info.linkedin) contactRow.innerHTML += \`<a href="\${ensureUrl(info.linkedin)}" target="_blank" class="contact-btn contact-mobile">LinkedIn</a>\`;
 
@@ -404,15 +406,14 @@ function render() {
     const hasAbout = (resumeData.education?.length > 0) || (resumeData.summary) || (resumeData.personalInfo?.summary);
     if (hasAbout) {
         main.innerHTML += \`<h2 class="section-head">Background</h2>\`;
-        if (resumeData.summary || info.summary) {
-            const card = document.createElement('div');
-            card.className = 'card-base';
-            card.innerHTML = \`
-                <div class="cat-title">About</div>
-                <p class="desc-text">\${resumeData.summary || info.summary}</p>
-            \`;
-            main.appendChild(card);
-        }
+        const sum = resumeData.summary || info.summary || "Breaking boundaries through creative innovation and strategic design...";
+        const card = document.createElement('div');
+        card.className = 'card-base';
+        card.innerHTML = \`
+            <div class="cat-title">About</div>
+            <p class="desc-text">\${sum}</p>
+        \`;
+        main.appendChild(card);
 
         if (resumeData.education?.length) {
             const card = document.createElement('div');
