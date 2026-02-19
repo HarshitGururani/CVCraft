@@ -201,7 +201,7 @@ function PreviewLayoutContent({
   );
 
   return (
-    <div className="flex h-[100dvh] w-full bg-gray-50 overflow-hidden">
+    <div className="flex h-dvh w-full bg-gray-50 overflow-hidden">
       {/* ── DESKTOP SIDEBAR (hidden on mobile) ── */}
       <aside
         className={`hidden lg:flex bg-white border-r border-gray-200 transition-all duration-300 flex-col shrink-0 ${
@@ -217,7 +217,7 @@ function PreviewLayoutContent({
       </aside>
 
       {/* ── MAIN COLUMN (preview + top-bar) ── */}
-      <div className="flex-1 flex flex-col min-w-0 h-[100dvh] overflow-hidden relative">
+      <div className="flex-1 flex flex-col min-w-0 h-dvh overflow-hidden relative">
         {/* Desktop floating "Edit" tab (only when sidebar is closed) */}
         {!open && (
           <button
