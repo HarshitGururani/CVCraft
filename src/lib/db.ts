@@ -38,6 +38,11 @@ async function dbConnect() {
   if (!cached.promise) {
     const opts = {
       bufferCommands: false,
+      dbName:
+        process.env.MONGODB_DB ||
+        (process.env.NODE_ENV === "production"
+          ? "cvcraft_prod"
+          : "cvcraft_dev"),
     };
 
     cached.promise = mongoose.connect(MONGODB_URI!, opts).then((mongoose) => {

@@ -73,6 +73,13 @@ export const metadata: Metadata = {
       "max-snippet": -1,
     },
   },
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/logo.png", type: "image/png" },
+    ],
+    apple: "/logo.png",
+  },
 };
 
 export default function RootLayout({
