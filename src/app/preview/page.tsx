@@ -21,6 +21,10 @@ const PreviewContent = () => {
   // True only when resume was confirmed fetched from DB (URL has ?id=...) or just saved
   const [hasDbRecord, setHasDbRecord] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
+  // Track the template that is currently LIVE (published)
+  const [publishedTemplateId, setPublishedTemplateId] = useState<string | null>(
+    null,
+  );
   const router = useRouter();
 
   useEffect(() => {
@@ -33,6 +37,9 @@ const PreviewContent = () => {
             setResumeData(data.resume);
             if (data.resume.templateId) {
               setSelectedTemplate(data.resume.templateId);
+            }
+            if (data.resume.isPublished && data.resume.templateId) {
+              setPublishedTemplateId(data.resume.templateId);
             }
             setShowTemplateSelector(false);
             setHasDbRecord(true); // Confirmed this resume exists in DB
@@ -177,6 +184,8 @@ const PreviewContent = () => {
             setIsDirty(true);
           }}
           templateName={selectedTemplate}
+          onSwitchTemplate={() => setShowTemplateSelector(true)}
+          publishedTemplateId={publishedTemplateId}
         >
           {renderTemplate()}
 

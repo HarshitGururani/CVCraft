@@ -10,6 +10,9 @@ import {
   Save,
   CheckCircle2,
   Loader2,
+  AlertTriangle,
+  Eye,
+  Pencil,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SidebarProvider, useSidebar } from "@/components/ui/sidebar";
@@ -28,6 +31,8 @@ interface PreviewLayoutProps {
   resumeData: ResumeData;
   onDataChange?: (data: ResumeData) => void;
   templateName?: string;
+  onSwitchTemplate?: () => void;
+  publishedTemplateId?: string | null;
 }
 
 // A dedicated sub-component to handle the internal flex logic
@@ -41,17 +46,24 @@ function PreviewLayoutContent({
   resumeData,
   onDataChange,
   templateName,
+  onSwitchTemplate,
+  publishedTemplateId,
 }: PreviewLayoutProps) {
   const [viewMode, setViewMode] = useState<"desktop" | "mobile">("desktop");
+  // Mobile tab: "edit" shows editor full-screen, "preview" shows the template
+  const [mobileTab, setMobileTab] = useState<"edit" | "preview">("edit");
   const [isSaving, setIsSaving] = useState(false);
-  // "saved" = persisted in DB, "success" = just saved (flash), "idle" = unsaved changes
   const [saveStatus, setSaveStatus] = useState<
     "idle" | "saved" | "success" | "error"
   >(isSaved ? "saved" : "idle");
-  // "published" = live, "success" = just published (flash), "idle" = not published / has changes
   const [publishStatus, setPublishStatus] = useState<
     "idle" | "publishing" | "published" | "success"
   >(isPublished ? "published" : "idle");
+  const [bannerDismissed, setBannerDismissed] = useState(false);
+  const templateChangedFromPublished =
+    !bannerDismissed &&
+    !!publishedTemplateId &&
+    templateName !== publishedTemplateId;
   const { open, setOpen } = useSidebar();
   const { data: session } = useSession();
 
@@ -60,7 +72,6 @@ function PreviewLayoutContent({
     resumeDataRef.current = resumeData;
   }, [resumeData]);
 
-  // Sync saveStatus with isSaved prop from parent
   useEffect(() => {
     if (isSaved) {
       setSaveStatus("saved");
@@ -68,6 +79,13 @@ function PreviewLayoutContent({
       setSaveStatus("idle");
     }
   }, [isSaved]);
+
+  useEffect(() => {
+    if (templateChangedFromPublished) {
+      setPublishStatus("idle");
+      setSaveStatus("idle");
+    }
+  }, [templateChangedFromPublished]);
 
   const handleSave = async () => {
     if (!session) {
@@ -80,7 +98,6 @@ function PreviewLayoutContent({
       const response = await fetch("/api/save-resume", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        // Use ref to guarantee latest data — avoids any stale closure issue
         body: JSON.stringify({
           ...resumeDataRef.current,
           templateId: templateName,
@@ -94,7 +111,6 @@ function PreviewLayoutContent({
         onDataChange?.(data.resume);
       }
 
-      // Flash "Saved!" then settle on "saved" (persisted state)
       setSaveStatus("success");
       setTimeout(() => setSaveStatus("saved"), 2000);
     } catch (error) {
@@ -107,12 +123,8 @@ function PreviewLayoutContent({
   };
 
   const handleDataChange = (newData: ResumeData) => {
-    // Any edit marks the resume as having unsaved changes
     setSaveStatus("idle");
     setPublishStatus("idle");
-    console.log(
-      `[PreviewLayout] handleDataChange title=${newData.personalInfo?.title}`,
-    );
     onDataChange?.(newData);
   };
 
@@ -121,7 +133,6 @@ function PreviewLayoutContent({
     setPublishStatus("publishing");
     try {
       await onPublish();
-      // Flash "Published!" then settle on "published"
       setPublishStatus("success");
       setTimeout(() => setPublishStatus("published"), 2000);
     } catch {
@@ -129,11 +140,71 @@ function PreviewLayoutContent({
     }
   };
 
+  // ── Reusable action buttons (used in both desktop top-bar and mobile bottom-bar) ──
+  const saveBtn = (
+    <Button
+      variant="outline"
+      size="sm"
+      onClick={handleSave}
+      disabled={isSaving || saveStatus === "saved"}
+      className={`h-8 transition-all ${
+        saveStatus === "success" || saveStatus === "saved"
+          ? "border-green-500 text-green-600 bg-green-50 hover:bg-green-50"
+          : saveStatus === "error"
+            ? "border-red-400 text-red-600 bg-red-50 hover:bg-red-50"
+            : "border-gray-300 bg-white text-gray-700 hover:bg-gray-50"
+      } text-[11px] font-medium`}
+    >
+      {isSaving ? (
+        <Loader2 size={12} className="mr-1 animate-spin" />
+      ) : saveStatus === "success" || saveStatus === "saved" ? (
+        <CheckCircle2 size={12} className="mr-1" />
+      ) : (
+        <Save size={12} className="mr-1" />
+      )}
+      {isSaving
+        ? "Saving..."
+        : saveStatus === "success"
+          ? "Saved!"
+          : saveStatus === "saved"
+            ? "Saved"
+            : "Save"}
+    </Button>
+  );
+
+  const publishBtn = (
+    <Button
+      size="sm"
+      onClick={handlePublish}
+      disabled={publishStatus === "publishing" || publishStatus === "published"}
+      className={`h-8 ${
+        publishStatus === "success" || publishStatus === "published"
+          ? "bg-green-600 hover:bg-green-600"
+          : "bg-primary hover:bg-primary/90"
+      } text-white text-[11px] px-4 font-bold shadow-sm transition-all`}
+    >
+      {publishStatus === "publishing" ? (
+        <Loader2 size={12} className="mr-1 animate-spin" />
+      ) : publishStatus === "success" || publishStatus === "published" ? (
+        <CheckCircle2 size={12} className="mr-1" />
+      ) : (
+        <Monitor size={12} className="mr-1" />
+      )}
+      {publishStatus === "publishing"
+        ? "Publishing..."
+        : publishStatus === "success"
+          ? "Published!"
+          : publishStatus === "published"
+            ? "Published"
+            : "Publish"}
+    </Button>
+  );
+
   return (
-    <div className="flex h-screen w-full bg-gray-50 overflow-hidden">
-      {/* 1. THE EDITOR COLUMN (The Sidebar) */}
+    <div className="flex h-[100dvh] w-full bg-gray-50 overflow-hidden">
+      {/* ── DESKTOP SIDEBAR (hidden on mobile) ── */}
       <aside
-        className={`bg-white border-r border-gray-200 transition-all duration-300 flex flex-col shrink-0 ${
+        className={`hidden lg:flex bg-white border-r border-gray-200 transition-all duration-300 flex-col shrink-0 ${
           open ? "w-[360px]" : "w-0"
         } overflow-hidden`}
       >
@@ -141,16 +212,17 @@ function PreviewLayoutContent({
           data={resumeData}
           onChange={handleDataChange}
           templateName={templateName}
+          onSwitchTemplate={onSwitchTemplate}
         />
       </aside>
 
-      {/* 2. THE PREVIEW COLUMN */}
-      <div className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden relative">
-        {/* Toggle Button for when sidebar is closed - more visible tab */}
+      {/* ── MAIN COLUMN (preview + top-bar) ── */}
+      <div className="flex-1 flex flex-col min-w-0 h-[100dvh] overflow-hidden relative">
+        {/* Desktop floating "Edit" tab (only when sidebar is closed) */}
         {!open && (
           <button
             onClick={() => setOpen(true)}
-            className="absolute left-0 top-1/2 -translate-y-1/2 z-50 flex items-center gap-2 bg-primary hover:bg-primary/90 cursor-pointer text-white pl-3 pr-4 py-3 rounded-r-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border-y border-r border-white/10 transition-all hover:scale-105 active:scale-95 group"
+            className="hidden lg:flex absolute left-0 top-1/2 -translate-y-1/2 z-50 items-center gap-2 bg-primary hover:bg-primary/90 cursor-pointer text-white pl-3 pr-4 py-3 rounded-r-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border-y border-r border-white/10 transition-all hover:scale-105 active:scale-95 group"
           >
             <ChevronRight
               size={18}
@@ -162,9 +234,10 @@ function PreviewLayoutContent({
           </button>
         )}
 
-        {/* Top Bar */}
-        <header className="h-14 bg-white border-b border-gray-200 flex items-center justify-between px-4 shrink-0 z-40">
-          <div className="flex items-center gap-3">
+        {/* ── TOP BAR ── */}
+        <header className="h-14 bg-white border-b border-gray-200 flex items-center justify-between px-3 md:px-4 shrink-0 z-40">
+          {/* Left side */}
+          <div className="flex items-center gap-2">
             <Button
               variant="ghost"
               size="sm"
@@ -172,28 +245,32 @@ function PreviewLayoutContent({
               className="text-gray-500 hover:text-gray-900 hover:bg-gray-100 h-8 px-2"
             >
               <ChevronLeft size={16} />
-              <span className="text-xs">All Templates</span>
+              <span className="text-xs hidden sm:inline">All Templates</span>
             </Button>
-            <div className="h-4 w-px bg-gray-200" />
 
-            <Button
-              variant={open ? "secondary" : "ghost"}
-              size="sm"
-              onClick={() => setOpen(!open)}
-              className={`h-8 gap-2 px-3 transition-colors ${
-                open
-                  ? "bg-primary/10 text-primary hover:bg-primary/20 border border-primary/20"
-                  : "text-gray-500 hover:text-gray-900 hover:bg-gray-100"
-              }`}
-            >
-              {open ? <ChevronLeft size={16} /> : <ChevronRight size={16} />}
-              <span className="text-xs font-bold uppercase tracking-tighter shrink-0">
-                {open ? "Hide Editor" : "Open Editor"}
-              </span>
-            </Button>
+            {/* Desktop sidebar toggle */}
+            <div className="hidden lg:flex items-center gap-2">
+              <div className="h-4 w-px bg-gray-200" />
+              <Button
+                variant={open ? "secondary" : "ghost"}
+                size="sm"
+                onClick={() => setOpen(!open)}
+                className={`h-8 gap-2 px-3 transition-colors ${
+                  open
+                    ? "bg-primary/10 text-primary hover:bg-primary/20 border border-primary/20"
+                    : "text-gray-500 hover:text-gray-900 hover:bg-gray-100"
+                }`}
+              >
+                {open ? <ChevronLeft size={16} /> : <ChevronRight size={16} />}
+                <span className="text-xs font-bold uppercase tracking-tighter shrink-0">
+                  {open ? "Hide Editor" : "Open Editor"}
+                </span>
+              </Button>
+            </div>
           </div>
 
-          <div className="flex items-center gap-1 bg-gray-100 border border-gray-200 rounded-lg p-1">
+          {/* Center: viewport toggle (desktop only) */}
+          <div className="hidden lg:flex items-center gap-1 bg-gray-100 border border-gray-200 rounded-lg p-1">
             <Button
               variant={viewMode === "desktop" ? "secondary" : "ghost"}
               size="sm"
@@ -222,80 +299,95 @@ function PreviewLayoutContent({
             </Button>
           </div>
 
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleSave}
-              disabled={isSaving || saveStatus === "saved"}
-              className={`h-8 transition-all ${
-                saveStatus === "success" || saveStatus === "saved"
-                  ? "border-green-500 text-green-600 bg-green-50 hover:bg-green-50"
-                  : saveStatus === "error"
-                    ? "border-red-400 text-red-600 bg-red-50 hover:bg-red-50"
-                    : "border-gray-300 bg-white text-gray-700 hover:bg-gray-50"
-              } text-[11px] font-medium`}
-            >
-              {isSaving ? (
-                <Loader2 size={12} className="mr-2 animate-spin" />
-              ) : saveStatus === "success" || saveStatus === "saved" ? (
-                <CheckCircle2 size={12} className="mr-2" />
-              ) : (
-                <Save size={12} className="mr-2" />
-              )}
-              {isSaving
-                ? "Saving..."
-                : saveStatus === "success"
-                  ? "Saved!"
-                  : saveStatus === "saved"
-                    ? "Saved"
-                    : "Save"}
-            </Button>
+          {/* Right: action buttons */}
+          <div className="flex items-center gap-1.5 md:gap-2">
+            {/* Download — hide on very small screens */}
             <Button
               variant="outline"
               size="sm"
               onClick={onDownload}
-              className="h-8 border-gray-300 bg-white text-gray-700 text-[11px] font-medium hover:bg-gray-50"
+              className="hidden sm:flex h-8 border-gray-300 bg-white text-gray-700 text-[11px] font-medium hover:bg-gray-50"
             >
-              <Download size={12} className="mr-2" />
-              Download ZIP
+              <Download size={12} className="mr-1" />
+              <span className="hidden md:inline">Download ZIP</span>
+              <span className="inline md:hidden">ZIP</span>
             </Button>
-            <Button
-              size="sm"
-              onClick={handlePublish}
-              disabled={
-                publishStatus === "publishing" || publishStatus === "published"
-              }
-              className={`h-8 ${
-                publishStatus === "success" || publishStatus === "published"
-                  ? "bg-green-600 hover:bg-green-600"
-                  : "bg-primary hover:bg-primary/90"
-              } text-white text-[11px] px-4 font-bold shadow-sm transition-all`}
-            >
-              {publishStatus === "publishing" ? (
-                <Loader2 size={12} className="mr-2 animate-spin" />
-              ) : publishStatus === "success" ||
-                publishStatus === "published" ? (
-                <CheckCircle2 size={12} className="mr-2" />
-              ) : (
-                <Monitor size={12} className="mr-2" />
-              )}
-              {publishStatus === "publishing"
-                ? "Publishing..."
-                : publishStatus === "success"
-                  ? "Published!"
-                  : publishStatus === "published"
-                    ? "Published"
-                    : "Publish"}
-            </Button>
+            {saveBtn}
+            {publishBtn}
           </div>
         </header>
 
-        {/* The Viewport Container */}
-        <main className="flex-1 bg-gray-100 flex items-center justify-center relative overflow-hidden">
-          {/* Background grid effect */}
-          <div className="absolute inset-0 bg-[linear-gradient(to_right,#00000005_1px,transparent_1px),linear-gradient(to_bottom,#00000005_1px,transparent_1px)] bg-size-[32px_32px] pointer-events-none" />
+        {/* Template Changed Banner */}
+        {templateChangedFromPublished && (
+          <div className="bg-amber-50 border-b border-amber-200 px-4 py-2 flex items-center justify-between gap-3 shrink-0 z-30">
+            <div className="flex items-center gap-2">
+              <AlertTriangle size={14} className="text-amber-500 shrink-0" />
+              <p className="text-xs text-amber-700 font-medium">
+                Template changed — your live portfolio will update once you
+                re-publish.
+              </p>
+            </div>
+            <button
+              onClick={() => setBannerDismissed(true)}
+              className="text-amber-400 hover:text-amber-600 text-xs font-bold shrink-0"
+            >
+              ✕
+            </button>
+          </div>
+        )}
 
+        {/* ── MOBILE: Editor or Preview (full-screen) ── */}
+        <div className="flex-1 flex flex-col overflow-hidden lg:hidden">
+          {mobileTab === "edit" ? (
+            <div className="flex-1 bg-white overflow-y-auto">
+              <ResumeFormEditor
+                data={resumeData}
+                onChange={handleDataChange}
+                templateName={templateName}
+                onSwitchTemplate={onSwitchTemplate}
+              />
+            </div>
+          ) : (
+            <main className="flex-1 bg-gray-100 overflow-auto">
+              <div className="w-full h-full overflow-auto">{children}</div>
+            </main>
+          )}
+
+          {/* Mobile bottom tab bar */}
+          <div className="bg-white border-t border-gray-200 flex shrink-0 safe-area-pb">
+            <button
+              onClick={() => setMobileTab("edit")}
+              className={`flex-1 flex flex-col items-center justify-center py-2 gap-0.5 transition-colors ${
+                mobileTab === "edit"
+                  ? "text-primary"
+                  : "text-gray-400 hover:text-gray-600"
+              }`}
+            >
+              <Pencil size={18} />
+              <span className="text-[10px] font-bold uppercase tracking-wider">
+                Edit
+              </span>
+            </button>
+            <button
+              onClick={() => setMobileTab("preview")}
+              className={`flex-1 flex flex-col items-center justify-center py-2 gap-0.5 transition-colors ${
+                mobileTab === "preview"
+                  ? "text-primary"
+                  : "text-gray-400 hover:text-gray-600"
+              }`}
+            >
+              <Eye size={18} />
+              <span className="text-[10px] font-bold uppercase tracking-wider">
+                Preview
+              </span>
+            </button>
+          </div>
+        </div>
+
+        {/* ── DESKTOP: The Viewport Container ── */}
+        <main className="hidden lg:flex flex-1 bg-gray-100 items-center justify-center relative overflow-hidden">
+          {/* Background grid */}
+          <div className="absolute inset-0 bg-[linear-gradient(to_right,#00000005_1px,transparent_1px),linear-gradient(to_bottom,#00000005_1px,transparent_1px)] bg-size-[32px_32px] pointer-events-none" />
           <div
             className={`bg-white shadow-[0_20px_50px_rgba(0,0,0,0.1)] transition-all duration-300 ease-out overflow-hidden rounded-xl border border-gray-200 ${
               viewMode === "desktop"

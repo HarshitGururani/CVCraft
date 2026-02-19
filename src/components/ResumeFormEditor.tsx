@@ -12,6 +12,7 @@ import {
   Trash2,
   CheckCircle,
   Sparkles,
+  Palette,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -24,6 +25,7 @@ interface ResumeFormEditorProps {
   data: ResumeData;
   onChange: (newData: ResumeData) => void;
   templateName?: string;
+  onSwitchTemplate?: () => void;
 }
 
 const TABS = [
@@ -39,6 +41,7 @@ export default function ResumeFormEditor({
   data,
   onChange,
   templateName,
+  onSwitchTemplate,
 }: ResumeFormEditorProps) {
   const [activeTab, setActiveTab] = useState("personal");
   const [showToast, setShowToast] = useState(false);
@@ -170,6 +173,19 @@ export default function ResumeFormEditor({
             <tab.icon size={20} />
           </button>
         ))}
+
+        <div className="mt-auto pt-4 border-t border-gray-200 w-full flex flex-col items-center gap-4">
+          <button
+            onClick={onSwitchTemplate}
+            className="p-3 rounded-xl transition-all text-gray-400 hover:text-primary hover:bg-primary/5 group"
+            title="Change Template"
+          >
+            <Palette
+              size={20}
+              className="group-hover:scale-110 transition-transform"
+            />
+          </button>
+        </div>
       </div>
 
       {/* Main Content Area */}
