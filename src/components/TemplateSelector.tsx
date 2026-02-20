@@ -192,19 +192,19 @@ export default function TemplateSelector({
 
       {/* Fixed Bottom Action Bar */}
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-50">
-        <div className="max-w-7xl mx-auto px-4 py-6 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-4 py-4 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
           <div className="flex flex-col">
-            <span className="text-sm text-gray-500 uppercase tracking-wide font-medium">
+            <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">
               Next Step
             </span>
-            <span className="text-lg font-semibold text-gray-900">
+            <span className="text-base font-semibold text-gray-900">
               Customization
             </span>
           </div>
 
           <button
             onClick={onNext}
-            className="bg-primary text-white px-8 py-3 rounded-lg hover:bg-primary/80 transition-colors font-semibold flex items-center gap-2 shadow-md hover:shadow-lg"
+            className="w-full sm:w-auto bg-primary text-white px-8 py-3 rounded-lg hover:bg-primary/80 transition-colors font-semibold flex items-center justify-center gap-2 shadow-md hover:shadow-lg"
           >
             Create my portfolio now
             <ArrowRight size={20} />
