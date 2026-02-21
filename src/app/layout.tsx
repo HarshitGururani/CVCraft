@@ -56,7 +56,7 @@ export const metadata: Metadata = {
       {
         url: "https://cv-craft-kappa.vercel.app/og.png", // Smaller fallback for WhatsApp
         width: 600,
-        height: 600,
+        height: 500,
         alt: "CV Craft Logo",
         type: "image/png",
       },
@@ -67,7 +67,7 @@ export const metadata: Metadata = {
     title: "CV Craft - Convert your CV into a Live Portfolio",
     description:
       "Instantly convert your static PDF CV into a stunning, live website.",
-    images: ["/og.png"],
+    images: ["https://cv-craft-kappa.vercel.app/og.png"],
     creator: "@cvcraft",
   },
   robots: {
