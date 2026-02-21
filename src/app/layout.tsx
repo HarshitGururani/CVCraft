@@ -47,7 +47,7 @@ export const metadata: Metadata = {
     siteName: "CV Craft",
     images: [
       {
-        url: "/og-image.png", // Assuming this exists or will be added
+        url: "/og.png", // Assuming this exists or will be added
         width: 1200,
         height: 630,
         alt: "CV Craft - Professional Portfolio Builder",
@@ -59,7 +59,7 @@ export const metadata: Metadata = {
     title: "CV Craft - Convert your CV into a Live Portfolio",
     description:
       "Instantly convert your static PDF CV into a stunning, live website.",
-    images: ["/og-image.png"],
+    images: ["/og.png"],
     creator: "@cvcraft",
   },
   robots: {

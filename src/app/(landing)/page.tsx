@@ -4,10 +4,16 @@ import Benefits from "@/components/Benefits";
 import HowItWorks from "@/components/HowItWorks";
 import MaxWidthWrapper from "@/components/MaxWidthWrapper";
 import WhatYouGet from "@/components/WhatYouGet";
+import { TypewriterEffect } from "@/components/ui/typewriter-effect";
 import React from "react";
 
 const FileUpload = dynamic(() => import("@/components/FileUpload"), {
   ssr: false,
+  loading: () => (
+    <div className="w-full max-w-xl mx-auto min-h-[300px] flex items-center justify-center">
+      <div className="w-full h-[280px] rounded-3xl border-2 border-dashed border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/30 animate-pulse" />
+    </div>
+  ),
 });
 
 const page = () => {
@@ -34,12 +40,22 @@ const page = () => {
         {/* Hero Content */}
         <MaxWidthWrapper className="relative z-10">
           <div className="flex flex-col items-center text-center">
-            <h1 className="text-2xl font-semibold tracking-tight text-gray-900 dark:text-white sm:text-6xl text-balance">
-              Craft your resume into a{" "}
-              <span className="bg-linear-to-r from-primary to-purple-600 bg-clip-text text-transparent">
-                portfolio
-              </span>
-            </h1>
+            <TypewriterEffect
+              words={[
+                { text: "Craft" },
+                { text: "your" },
+                { text: "resume" },
+                { text: "into" },
+                { text: "a" },
+                {
+                  text: "portfolio",
+                  className:
+                    "bg-linear-to-r from-primary to-purple-600 bg-clip-text text-transparent",
+                },
+              ]}
+              className="text-2xl font-semibold tracking-tight text-gray-900 dark:text-white sm:text-6xl text-balance"
+              cursorClassName="bg-primary h-8 sm:h-12"
+            />
             <p className="mt-6 text-lg leading-6 text-gray-600 dark:text-gray-300 max-w-2xl">
               Instantly convert your static PDF CV into a stunning, live website
               to showcase your work to the world. No coding required.
@@ -53,8 +69,8 @@ const page = () => {
       </section>
 
       <HowItWorks />
-      <WhatYouGet />
       <Benefits />
+      <WhatYouGet />
     </main>
   );
 };
