@@ -54,7 +54,7 @@ export const metadata: Metadata = {
         type: "image/png",
       },
       {
-        url: "https://cv-craft-kappa.vercel.app/logo.png", // Smaller fallback for WhatsApp
+        url: "https://cv-craft-kappa.vercel.app/og.png", // Smaller fallback for WhatsApp
         width: 600,
         height: 600,
         alt: "CV Craft Logo",
