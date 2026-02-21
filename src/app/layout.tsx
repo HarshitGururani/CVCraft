@@ -40,17 +40,25 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://cvcraft.vercel.app", // Fallback URL
+    url: "https://cvcraft.vercel.app",
     title: "CV Craft - Convert your CV into a Live Portfolio",
     description:
       "Instantly convert your static PDF CV into a stunning, live website. No coding required.",
     siteName: "CV Craft",
     images: [
       {
-        url: "/og.png", // Assuming this exists or will be added
+        url: "https://cv-craft-kappa.vercel.app/og.png", // Explicit absolute URL
         width: 1200,
         height: 630,
         alt: "CV Craft - Professional Portfolio Builder",
+        type: "image/png",
+      },
+      {
+        url: "https://cv-craft-kappa.vercel.app/logo.png", // Smaller fallback for WhatsApp
+        width: 600,
+        height: 600,
+        alt: "CV Craft Logo",
+        type: "image/png",
       },
     ],
   },
